@@ -14,7 +14,7 @@ import (
 
 type IReadTransactionFromSuiAPI interface {
 	SuiGetTotalTransactionBlocks(ctx context.Context) (uint64, error)
-	SuiGetTransactionBlock(ctx context.Context, req models.SuiGetTransactionBlockRequest) (models.SuiTransactionBlockResponse, error)
+	SuiGetTransactionBlock(ctx context.Context, req models.SuiGetTransactionBlockRequest) (models.SuiTransactionBlockResponse, []byte, error)
 	SuiMultiGetTransactionBlocks(ctx context.Context, req models.SuiMultiGetTransactionBlocksRequest) (models.SuiMultiGetTransactionBlocksResponse, error)
 	SuiXQueryTransactionBlocks(ctx context.Context, req models.SuiXQueryTransactionBlocksRequest) (models.SuiXQueryTransactionBlocksResponse, error)
 	SuiDryRunTransactionBlock(ctx context.Context, req models.SuiDryRunTransactionBlockRequest) (models.SuiTransactionBlockResponse, error)
@@ -40,7 +40,7 @@ func (s *suiReadTransactionFromSuiImpl) SuiGetTotalTransactionBlocks(ctx context
 }
 
 // SuiGetTransactionBlock implements the method `sui_getTransactionBlock`, gets the transaction response object for a specified transaction digest.
-func (s *suiReadTransactionFromSuiImpl) SuiGetTransactionBlock(ctx context.Context, req models.SuiGetTransactionBlockRequest) (models.SuiTransactionBlockResponse, error) {
+func (s *suiReadTransactionFromSuiImpl) SuiGetTransactionBlock(ctx context.Context, req models.SuiGetTransactionBlockRequest) (models.SuiTransactionBlockResponse, []byte, error) {
 	var rsp models.SuiTransactionBlockResponse
 	respBytes, err := s.conn.Request(ctx, httpconn.Operation{
 		Method: "sui_getTransactionBlock",
@@ -50,16 +50,16 @@ func (s *suiReadTransactionFromSuiImpl) SuiGetTransactionBlock(ctx context.Conte
 		},
 	})
 	if err != nil {
-		return rsp, err
+		return rsp, respBytes, err
 	}
 	if gjson.ParseBytes(respBytes).Get("error").Exists() {
-		return rsp, errors.New(gjson.ParseBytes(respBytes).Get("error").String())
+		return rsp, respBytes, errors.New(gjson.ParseBytes(respBytes).Get("error").String())
 	}
 	err = json.Unmarshal([]byte(gjson.ParseBytes(respBytes).Get("result").Raw), &rsp)
 	if err != nil {
-		return rsp, err
+		return rsp, respBytes, err
 	}
-	return rsp, nil
+	return rsp, respBytes, nil
 }
 
 // SuiMultiGetTransactionBlocks implements the method `sui_multiGetTransactionBlocks`, gets an ordered list of transaction responses.
