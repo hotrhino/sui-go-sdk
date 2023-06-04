@@ -228,7 +228,7 @@ func TestOnReadTransactionFromSui(t *testing.T) {
 	})
 
 	t.Run("test on sui_getTransactionBlock", func(t *testing.T) {
-		rsp, err := cli.SuiGetTransactionBlock(ctx, models.SuiGetTransactionBlockRequest{
+		rsp, _, err := cli.SuiGetTransactionBlock(ctx, models.SuiGetTransactionBlockRequest{
 			Digest: "2LYaFDf5oU64xguKAjSiH7TarPSkxc35sN6rPc8RsoWf",
 			Options: models.SuiTransactionBlockOptions{
 				ShowInput:    true,

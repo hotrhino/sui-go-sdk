@@ -141,7 +141,7 @@ func SuiGetTotalTransactionBlocks() {
 }
 
 func SuiGetTransactionBlock() {
-	rsp, err := cli.SuiGetTransactionBlock(ctx, models.SuiGetTransactionBlockRequest{
+	rsp, _, err := cli.SuiGetTransactionBlock(ctx, models.SuiGetTransactionBlockRequest{
 		Digest: "CeVpDXKKU3Gs89efej9pKiYYQyTzifE2BDxWwquUaUht",
 		Options: models.SuiTransactionBlockOptions{
 			ShowInput:          true,
